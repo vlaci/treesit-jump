@@ -201,7 +201,6 @@
 
 (defun treesit-jump--query-select-go-to (query-list)
   "Input a `QUERY-LIST' select a capture from it and go to it."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected))))
@@ -210,7 +209,6 @@
 
 (defun treesit-jump--query-select-visual (query-list)
   "Input a `QUERY-LIST' select a capture from it and select it's region."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected)))
@@ -221,7 +219,6 @@
 
 (defun treesit-jump--query-select-delete (query-list)
   "Input a `QUERY-LIST' select a capture from it and delete it."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected)))
