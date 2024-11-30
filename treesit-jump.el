@@ -5,7 +5,7 @@
 ;; Author: Donovan Miller
 ;; URL: https://github.com/dmille56/treesit-jump
 ;; Package-Version: 0.0.1
-;; Package-Requires: ((emacs "29.1") (avy "0.4") (transient "0.5.3") (gptel "0.8.5"))
+;; Package-Requires: ((emacs "29.1") (avy "0.4") (transient "0.5.3"))
 ;; Keywords: treesit, treesitter, avy, jump, matching, gptel
 
 ;;; Commentary:
@@ -28,9 +28,9 @@
 (require 'treesit)
 (require 'cl-lib)
 (require 'avy nil 'noerror)
-(require 'gptel)
 (require 'map)
 
+(declare-function gptel-request "gptel")
 
 
 ;;;###autoload(autoload 'treesit-jump-transient "treesit-jump" "Transient for using treesit-jump." t)
@@ -360,6 +360,8 @@ Outputs the RESPONSE to a new buffer.  INFO unused for now."
 (defun treesit-jump-gptel-describe ()
   "Select and select the region of a treesit query for the current major-mode."
   (interactive)
+  (unless (require 'gptel nil :noerror)
+    (user-error "You need to install `gptel' to use this command"))
   (treesit-jump-get-and-process-captures #'treesit-jump--query-select-visual)
   (if (use-region-p)
       (progn
