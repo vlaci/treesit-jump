@@ -24,16 +24,16 @@
 ;; https://github.com/emacs-mirror/emacs/blob/master/admin/notes/tree-sitter/starter-guide
 ;; https://git.sr.ht/~meow_king/ts-query-highlight
 
+(require 'transient)
 (require 'treesit)
 (require 'cl-lib)
 (require 'avy nil 'noerror)
 (require 'gptel)
 (require 'map)
 
-;;;###autoload
-(eval-and-compile (require 'transient)) ;; use eval-and-compile to fix byte-compile issues with transient macro
 
-;;;###autoload
+
+;;;###autoload(autoload 'treesit-jump-transient "treesit-jump" "Transient for using treesit-jump." t)
 (transient-define-prefix treesit-jump-transient ()
   "Transient for using treesit-jump."
   ["Treesit-Jump"
