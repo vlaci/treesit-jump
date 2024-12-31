@@ -5,7 +5,7 @@
 ;; Author: Donovan Miller
 ;; URL: https://github.com/dmille56/treesit-jump
 ;; Package-Version: 0.0.1
-;; Package-Requires: ((emacs "29.1") (avy "0.4") (transient "0.5.3") (gptel "0.8.5"))
+;; Package-Requires: ((emacs "29.1") (avy "0.4") (transient "0.5.3"))
 ;; Keywords: treesit, treesitter, avy, jump, matching, gptel
 
 ;;; Commentary:
@@ -24,16 +24,16 @@
 ;; https://github.com/emacs-mirror/emacs/blob/master/admin/notes/tree-sitter/starter-guide
 ;; https://git.sr.ht/~meow_king/ts-query-highlight
 
+(require 'transient)
 (require 'treesit)
 (require 'cl-lib)
 (require 'avy nil 'noerror)
-(require 'gptel)
 (require 'map)
 
-;;;###autoload
-(eval-and-compile (require 'transient)) ;; use eval-and-compile to fix byte-compile issues with transient macro
+(declare-function gptel-request "gptel")
 
-;;;###autoload
+
+;;;###autoload(autoload 'treesit-jump-transient "treesit-jump" "Transient for using treesit-jump." t)
 (transient-define-prefix treesit-jump-transient ()
   "Transient for using treesit-jump."
   ["Treesit-Jump"
@@ -56,7 +56,7 @@
 (defcustom treesit-jump-queries-filter-mode-alist nil
   "Query captures to filter out of results using regex for each mode."
   :group 'treesit-jump
-  :type '(alist :key-type (symbol) :value-type '(repeat string)))
+  :type '(alist :key-type (symbol) :value-type (repeat string)))
 
 (defcustom treesit-jump-queries-filter-func #'treesit-jump--queries-filter-default-func
   "Function used to filter matched treesit queries."
@@ -71,7 +71,7 @@
 (defcustom treesit-jump-queries-extra-alist nil
   "Alist that maps major modes to extra queries to search for."
   :group 'treesit-jump
-  :type '(alist :key-type (symbol) :value-type '(repeat string)))
+  :type '(alist :key-type (symbol) :value-type (repeat string)))
 
 (defcustom treesit-jump-code-describe-prompt "You are an expert programmer.  Describe this code."
   "Prompt string to use when describing code using treesit-jump."
@@ -201,7 +201,6 @@
 
 (defun treesit-jump--query-select-go-to (query-list)
   "Input a `QUERY-LIST' select a capture from it and go to it."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected))))
@@ -210,7 +209,6 @@
 
 (defun treesit-jump--query-select-visual (query-list)
   "Input a `QUERY-LIST' select a capture from it and select it's region."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected)))
@@ -221,7 +219,6 @@
 
 (defun treesit-jump--query-select-delete (query-list)
   "Input a `QUERY-LIST' select a capture from it and delete it."
-  (interactive)
   (let* (
          (selected (treesit-jump--query-select query-list))
          (start (treesit-node-start (cdr selected)))
@@ -304,10 +301,10 @@ It might not be on the fist line and so we cannot just get the first line."
 
     (unless (treesit-language-available-p (intern lang-name))
       (error (format "Treesit is not available for language %s" lang-name)))
-    
+
     (unless (file-directory-p treesit-jump-queries-dir)
       (error (format "Treesit-queries directory not found at: %s. Make sure your config include the treesit-queries directory if using straight." treesit-jump-queries-dir)))
-    
+
     (let* (
            (queries-dir treesit-jump-queries-dir)
            (query (treesit-jump--get-query-from-cache-or-dir lang-name queries-dir t))
@@ -334,7 +331,7 @@ It might not be on the fist line and so we cannot just get the first line."
   (treesit-jump-get-and-process-captures #'treesit-jump--query-select-delete))
 
 (defun treesit-jump--gptel-callback (response info)
-  "Callback function from calling gptel-request.
+  "Callback function from calling `gptel-request'.
 Outputs the RESPONSE to a new buffer.  INFO unused for now."
   (if response
       (let ((buffer (treesit-jump--get-or-create-buffer treesit-jump--gpt-buffer-name)))
@@ -363,6 +360,8 @@ Outputs the RESPONSE to a new buffer.  INFO unused for now."
 (defun treesit-jump-gptel-describe ()
   "Select and select the region of a treesit query for the current major-mode."
   (interactive)
+  (unless (require 'gptel nil :noerror)
+    (user-error "You need to install `gptel' to use this command"))
   (treesit-jump-get-and-process-captures #'treesit-jump--query-select-visual)
   (if (use-region-p)
       (progn
