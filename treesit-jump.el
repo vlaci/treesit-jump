@@ -122,6 +122,8 @@
                           (julia-mode . "julia")
                           (julia-ts-mode . "julia")
                           (matlab-mode . "matlab")
+                          (nix-mode . "nix")
+                          (nix-ts-mode . "nix")
                           (php-mode . "php")
                           (php-ts-mode . "php")
                           (powershell-mode . "powershell")
