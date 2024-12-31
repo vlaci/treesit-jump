@@ -19,13 +19,17 @@
 
 ((function_definition
    name: (identifier) @_name
-   body: (block)? @test.inner) @test.outer)
+   body: (block)? @test.inner) @test.outer
+ (#match "^test_" @_name))
 
-(for_statement
- body: (_) @loop.inner) @loop.outer
+(list
+  (_) @entry.outer)
 
-(while_statement
- body: (_) @loop.inner) @loop.outer
+(tuple
+  (_) @entry.outer)
 
-(if_statement
- consequence: (_) @conditional.inner) @conditional.outer
+(set
+  (_) @entry.outer)
+
+(pair
+  (_) @entry.inner) @entry.outer
